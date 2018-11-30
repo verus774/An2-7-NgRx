@@ -129,9 +129,9 @@
     },
     "@schematics/angular:directive": {
       "prefix": "app"
-    },
-    "cli": {
-      "defaultCollection": "@ngrx/schematics"
     }
+  },
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
   }
 }
