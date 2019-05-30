@@ -1,23 +1,34 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { Store, select } from '@ngrx/store';
+import { Observable } from 'rxjs';
+
+import { AppState, TasksState, getTasksState, getTasksData, getTasksError } from './../../../core/+store';
+import * as TasksActions from './../../../core/+store/tasks/tasks.actions';
+
 import { TaskModel } from './../../models/task.model';
-import { TaskPromiseService } from './../../services';
 
 @Component({
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css']
 })
 export class TaskListComponent implements OnInit {
-  tasks: Promise<Array<TaskModel>>;
+  tasks$: Observable<ReadonlyArray<TaskModel>>;
+  tasksError$: Observable<Error | string>;
 
   constructor(
     private router: Router,
-    private taskPromiseService: TaskPromiseService
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
-    this.tasks = this.taskPromiseService.getTasks();
+    console.log('We have a store! ', this.store);
+
+    this.tasks$ = this.store.pipe(select(getTasksData));
+    this.tasksError$ = this.store.pipe(select(getTasksError));
+
+    this.store.dispatch(new TasksActions.GetTasks());
   }
 
   onCreateTask() {
@@ -26,7 +37,8 @@ export class TaskListComponent implements OnInit {
   }
 
   onCompleteTask(task: TaskModel): void {
-    this.updateTask(task).catch(err => console.log(err));
+    const doneTask = {...task, done: true};
+    this.store.dispatch(new TasksActions.UpdateTask(doneTask));
   }
 
   onEditTask(task: TaskModel): void {
@@ -35,20 +47,7 @@ export class TaskListComponent implements OnInit {
   }
 
   onDeleteTask(task: TaskModel) {
-    this.taskPromiseService
-      .deleteTask(task)
-      .then(() => (this.tasks = this.taskPromiseService.getTasks()))
-      .catch(err => console.log(err));
+    this.store.dispatch(new TasksActions.DeleteTask(task));
   }
 
-  private async updateTask(task: TaskModel) {
-    const updatedTask = await this.taskPromiseService.updateTask({
-      ...task,
-      done: true
-    });
-
-    const tasks: TaskModel[] = await this.tasks;
-    const index = tasks.findIndex(t => t.id === updatedTask.id);
-    tasks[index] = { ...updatedTask };
-  }
 }

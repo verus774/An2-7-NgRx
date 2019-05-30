@@ -1,50 +1,50 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
-// rxjs
-import { switchMap, tap } from 'rxjs/operators';
+import { Store, select } from '@ngrx/store';
+import { AppState, TasksState, getTasksState, getSelectedTask } from './../../../core/+store';
+import * as TasksActions from './../../../core/+store/tasks/tasks.actions';
+
+import { Observable, Subscription } from 'rxjs';
+import { AutoUnsubscribe } from './../../../core';
 
 import { TaskModel } from './../../models/task.model';
-import { TaskPromiseService } from './../../services';
 
 @Component({
   templateUrl: './task-form.component.html',
   styleUrls: ['./task-form.component.css']
 })
+@AutoUnsubscribe()
 export class TaskFormComponent implements OnInit {
   task: TaskModel;
 
+  private sub: Subscription;
+
   constructor(
-    private taskPromiseService: TaskPromiseService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
-    this.task = new TaskModel();
-
-    this.route.paramMap
-      .pipe(
-        switchMap((params: Params) => {
-          return params.get('taskID')
-            ? this.taskPromiseService.getTask(+params.get('taskID'))
-            : Promise.resolve(null);
-        })
-      )
-      .subscribe(
-        // when Promise.resolve(null) => task = null => {...null} => {}
-        task => (this.task = { ...task }),
-        err => console.log(err)
-      );
+    this.sub = this.store.pipe(select(getSelectedTask))
+      .subscribe(task => {
+        if (task) {
+          this.task = task;
+        } else {
+          this.task = new TaskModel();
+        }
+      });
   }
 
   onSaveTask() {
     const task = { ...this.task };
 
-    const method = task.id ? 'updateTask' : 'createTask';
-    this.taskPromiseService[method](task)
-      .then(() => this.onGoBack())
-      .catch(err => console.log(err));
+    if (task.id) {
+      this.store.dispatch(new TasksActions.UpdateTask(task));
+    } else {
+      this.store.dispatch(new TasksActions.CreateTask(task));
+    }
   }
 
   onGoBack(): void {

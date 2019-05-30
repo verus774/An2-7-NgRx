@@ -7,7 +7,8 @@ import { TaskComponent, TaskFormComponent, TaskListComponent } from './component
 import { TasksServicesModule } from './tasks-services.module';
 
 import { StoreModule } from '@ngrx/store';
-import { tasksReducer } from './../core/+store';
+import { EffectsModule } from '@ngrx/effects';
+import { TasksEffects, tasksReducer } from '../core/+store';
 
 @NgModule({
   declarations: [TaskListComponent, TaskFormComponent, TaskComponent],
@@ -16,7 +17,8 @@ import { tasksReducer } from './../core/+store';
     FormsModule,
     TasksRoutingModule,
     TasksServicesModule,
-    StoreModule.forFeature('tasks', tasksReducer)
+    StoreModule.forFeature('tasks', tasksReducer),
+    EffectsModule.forFeature([TasksEffects])
   ],
   providers: []
 })
