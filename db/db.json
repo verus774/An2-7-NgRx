@@ -2,7 +2,7 @@
   "tasks": [
     {
       "id": 1,
-      "action": "Estimate",
+      "action": "Estimate123",
       "priority": 1,
       "estHours": 8
     },
@@ -29,12 +29,6 @@
       "action": "Build",
       "priority": 1,
       "estHours": 4
-    },
-    {
-      "id": 6,
-      "action": "Deploy",
-      "priority": 2,
-      "estHours": 8
     }
   ],
   "users": [
