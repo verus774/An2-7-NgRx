@@ -30,7 +30,7 @@ const routes: Routes = [
     path: 'users',
     loadChildren: './users/users.module#UsersModule',
     data: {
-      preload: true,
+      // preload: true,
       title: 'Users'
     }
   },
