@@ -5,7 +5,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 
-import { RouterStateSerializerProvider, routerReducers } from './router';
+import { RouterStateSerializerProvider, routerReducers, RouterEffects } from './router';
 import { environment } from './../../../environments/environment';
 
 
@@ -14,7 +14,7 @@ import { environment } from './../../../environments/environment';
     CommonModule,
     StoreModule.forRoot(routerReducers),
     StoreRouterConnectingModule.forRoot(),
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([RouterEffects]),
     // Instrumentation must be imported after importing StoreModule (config is optional)
     !environment.production ? StoreDevtoolsModule.instrument() : [],
   ],

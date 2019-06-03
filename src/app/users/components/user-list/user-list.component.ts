@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import * as RouterActions from './../../../core/+store/router/router.actions';
 
 import { Observable, Subscription } from 'rxjs';
 import { Store, select } from '@ngrx/store';
@@ -22,7 +22,6 @@ export class UserListComponent implements OnInit {
   private subscription: Subscription;
 
   constructor(
-    private router: Router,
     private store: Store<AppState>,
   ) {}
 
@@ -44,7 +43,9 @@ export class UserListComponent implements OnInit {
 
   onEditUser(user: UserModel) {
     const link = ['/users/edit', user.id];
-    this.router.navigate(link);
+    this.store.dispatch(new RouterActions.Go({
+      path: link
+    }));
     // or
     // const link = ['edit', user.id];
     // this.router.navigate(link, {relativeTo: this.route});
